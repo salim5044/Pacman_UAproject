@@ -23,12 +23,10 @@ jobs:
               pkg-config
       
       - run:
-          name: Show CMake version
-          command: cmake --version
-      
-      - run:
-          name: Show GCC version
-          command: g++ --version
+          name: Show versions
+          command: |
+            cmake --version
+            g++ --version
       
       - run:
           name: Create build directory
@@ -47,12 +45,15 @@ jobs:
             cmake --build . --config Release -j2
       
       - run:
-          name: List build output
+          name: Show build results
           command: |
-            echo "=== Build directory contents ==="
-            ls -lR build/
-            echo "=== Looking for executables ==="
-            find build/ -type f -executable -ls
+            echo "=== Build directory structure ==="
+            find build/ -type f | head -30
+            echo ""
+            echo "=== All executable files ==="
+            find build/ -type f -executable
+            echo ""
+            echo "✓ Build completed successfully!"
 
 workflows:
   version: 2
