@@ -1,61 +1,31 @@
+# Use the latest 2.1 version of CircleCI pipeline process engine.
+# See: https://circleci.com/docs/reference/configuration-reference
 version: 2.1
 
+# Define a job to be invoked later in a workflow.
+# See: https://circleci.com/docs/guides/orchestrate/jobs-steps/#jobs-overview & https://circleci.com/docs/reference/configuration-reference/#jobs
 jobs:
-  build:
+  say-hello:
+    # Specify the execution environment. You can specify an image from Docker Hub or use one of our convenience images from CircleCI's Developer Hub.
+    # See: https://circleci.com/docs/guides/execution-managed/executor-intro/ & https://circleci.com/docs/reference/configuration-reference/#executor-job
     docker:
-      - image: ubuntu:24.04
+      # Specify the version you desire here
+      # See: https://circleci.com/developer/images/image/cimg/base
+      - image: cimg/base:current
 
-    resource_class: medium
-
+    # Add steps to the job
+    # See: https://circleci.com/docs/guides/orchestrate/jobs-steps/#steps-overview & https://circleci.com/docs/reference/configuration-reference/#steps
     steps:
+      # Checkout the code as the first step.
       - checkout
-
       - run:
-          name: Install dependencies
-          command: |
-            apt-get update
-            DEBIAN_FRONTEND=noninteractive apt-get install -y \
-              cmake \
-              g++ \
-              libsfml-dev \
-              git \
-              build-essential \
-              pkg-config
+          name: "Say hello"
+          command: "echo Hello, World!"
 
-      - run:
-          name: Show CMake version
-          command: cmake --version
-
-      - run:
-          name: Show GCC version
-          command: g++ --version
-
-      - run:
-          name: Create build directory
-          command: mkdir -p build
-
-      - run:
-          name: Configure with CMake
-          command: |
-            cd build
-            cmake .. -DCMAKE_BUILD_TYPE=Release
-
-      - run:
-          name: Build project
-          command: |
-            cd build
-            cmake --build . --config Release -j2
-
-      - run:
-          name: List build output
-          command: |
-            echo "=== Build directory contents ==="
-            ls -lR build/
-            echo "=== Looking for executables ==="
-            find build/ -type f -executable -ls
-
+# Orchestrate jobs using workflows
+# See: https://circleci.com/docs/guides/orchestrate/workflows/ & https://circleci.com/docs/reference/configuration-reference/#workflows
 workflows:
-  version: 2
-  build-and-test:
+  say-hello-workflow: # This is the name of the workflow, feel free to change it to better match your workflow.
+    # Inside the workflow, you define the jobs you want to run.
     jobs:
-      - build
+      - say-hello
