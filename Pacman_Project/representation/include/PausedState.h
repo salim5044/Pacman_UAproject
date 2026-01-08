@@ -1,5 +1,5 @@
 #pragma once
-#include "GameState.h"
+#include "Gamestate.h"
 #include <SFML/Graphics.hpp>
 
 class PausedState : public GameState {
