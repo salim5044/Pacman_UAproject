@@ -1,61 +1,45 @@
 version: 2.1
 
 jobs:
-  build:
+  build-and-compile:
     docker:
       - image: ubuntu:24.04
-
-    resource_class: medium
-
+    
     steps:
       - checkout
-
+      
       - run:
           name: Install dependencies
           command: |
             apt-get update
-            DEBIAN_FRONTEND=noninteractive apt-get install -y \
-              cmake \
-              g++ \
-              libsfml-dev \
-              git \
-              build-essential \
-              pkg-config
-
-      - run:
-          name: Show CMake version
-          command: cmake --version
-
-      - run:
-          name: Show GCC version
-          command: g++ --version
-
-      - run:
-          name: Create build directory
-          command: mkdir -p build
-
+            apt-get install -y build-essential cmake libsfml-dev
+      
       - run:
           name: Configure with CMake
           command: |
+            mkdir build
             cd build
-            cmake .. -DCMAKE_BUILD_TYPE=Release
-
+            cmake ..
+      
       - run:
-          name: Build project
+          name: Compile project
           command: |
             cd build
-            cmake --build . --config Release -j2
-
+            make -j$(nproc)
+      
       - run:
-          name: List build output
+          name: Verify build succeeded
           command: |
-            echo "=== Build directory contents ==="
-            ls -lR build/
-            echo "=== Looking for executables ==="
-            find build/ -type f -executable -ls
+            if [ -f "build/Pacman_Retry" ]; then
+              echo "✓ Build successful - executable created"
+              ls -lh build/Pacman_Retry
+            else
+              echo "✗ Build failed - executable not found"
+              exit 1
+            fi
 
 workflows:
   version: 2
-  build-and-test:
+  build-workflow:
     jobs:
-      - build
+      - build-and-compile
